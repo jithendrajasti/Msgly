@@ -1,34 +1,37 @@
 const express = require('express');
-const { authRouter } = require('./routes/authRoutes');
-const { connectDB } = require('./lib/db');
-const messageRouter = require('./routes/messageRoutes');
 const path = require('path');
-
-const { app, io, server } = require('./lib/socket');
-require('dotenv').config();
-const cors = require('cors');
 const cookieParser = require('cookie-parser');
 
-app.use(cors({
-    origin: [process.env.FRONTEND_URL],
-    credentials: true
-}));
-app.use(express.json({ limit: "10mb" }));
-app.use(cookieParser());
+// --- Local Imports ---
+const { authRouter } = require('./routes/authRoutes');
+const messageRouter = require('./routes/messageRoutes');
+const { connectDB } = require('./lib/db');
+const { app, server } = require('./lib/socket');
 
-if (process.env.NODE_ENV === "production") {
-    app.use(express.static(path.join(__dirname, "../frontend/dist")));
-    app.get("*", (req, res) => {
-        res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
-    });
-}
+const PORT = process.env.PORT || 5000;
+const __dirname = path.resolve();
 
+// --- 1. CORE MIDDLEWARE ---
+app.use(express.json({ limit: "10mb" })); // To parse JSON payloads
+app.use(cookieParser()); // To parse cookies for authentication
+
+// --- 2. API ROUTES ---
+// All API calls are handled first
 app.use('/api/auth', authRouter);
-app.use('/api/message', messageRouter)
-const port = process.env.PORT;
+app.use('/api/message', messageRouter);
 
+// --- 3. SERVE STATIC FRONTEND ---
+// Serve static files from the React app's 'dist' folder
+app.use(express.static(path.join(__dirname, "frontend", "dist")));
 
-server.listen(port || 5000, () => {
-    console.log(`server is running in port ${port ? port : 5000}`);
+// The "catch-all" handler: for any request that doesn't match an API route,
+// send back React's index.html file.
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
+});
+
+// --- SERVER INITIALIZATION ---
+server.listen(PORT, () => {
+    console.log(`✅ Server is running on port ${PORT}`);
     connectDB();
 });
