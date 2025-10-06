@@ -19,7 +19,6 @@ app.get('/', (req, res) => {
     res.send("Hello jithu!");
 });
 
-const __dirname = path.resolve();
 
 if (process.env.NODE_ENV === "production") {
     app.use(express.static(path.join(__dirname, "../frontend/dist")));
