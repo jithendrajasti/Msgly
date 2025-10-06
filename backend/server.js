@@ -9,7 +9,6 @@ const { connectDB } = require('./lib/db');
 const { app, server } = require('./lib/socket');
 
 const PORT = process.env.PORT || 5000;
-const __dirname = path.resolve();
 
 // --- 1. CORE MIDDLEWARE ---
 app.use(express.json({ limit: "10mb" })); // To parse JSON payloads
