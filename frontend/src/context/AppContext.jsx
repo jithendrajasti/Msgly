@@ -12,7 +12,7 @@ export const AppContextProvider = (props) => {
     // --- URL MANAGEMENT ---
 
     // Base URL for the backend from environment variables
-    const backend_base_url = import.meta.env.VITE_BACKEND_URL;
+    const backend_base_url = import.meta.env.MODE==="development" ?import.meta.env.VITE_BACKEND_URL:"";
 
     // URL specifically for API calls, with the "/api" prefix
     const backend_api_url = `${backend_base_url}/api`;
